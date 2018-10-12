@@ -12,7 +12,34 @@ def main():
 
     all_drivers = get_all_drivers(dataset_name)
 
-    chain_all_drivers_into_script(all_drivers, 10)
+    script_string = chain_all_drivers_into_script(all_drivers, 10)
+
+    script_string = reroute_pileup_input_to_cached_files(script_string)
+
+    print script_string
+
+#############################################################
+# Input : chained script string
+# Output : pileup_input option replaced with local files in order to not time out in DAS query
+def reroute_pileup_input_to_cached_files(script_string):
+
+    pileup_caches = {
+        "    --pileup_input \"dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW\" \\" : "    --pileup_input \"file:/hadoop/cms/store/user/mliu/pileupfile/summer16_fullsim.root\" \\"
+    }
+
+    rtn_str_list = []
+    for line in script_string.split("\n"):
+        if "--pileup_input" in line:
+            if line in pileup_caches:
+                rtn_str_list.append(pileup_caches[line])
+            else:
+                print "ERROR - Failed to find a local cache for the pileup input"
+                print line
+                sys.exit(259)
+        else:
+            rtn_str_list.append(line)
+
+    return "\n".join(rtn_str_list)
 
 #############################################################
 # Input  : list of all driver commands, Nevents to generate
@@ -59,7 +86,7 @@ def chain_all_drivers_into_script(all_drivers, nevents=500):
         else:
             modded_chained_driver.append(line)
 
-    print "\n".join(modded_chained_driver)
+    return "\n".join(modded_chained_driver)
 
 #############################################################
 # Input  : list of drivers
