@@ -69,7 +69,7 @@ def chain_all_drivers_into_script(all_drivers, nevents=500):
     # Get the modded lines
     modded_lines = []
     for index, line in enumerate(lines_to_mod):
-        filename = "file_%s.root" % (datatiers[index/2])
+        filename = "file:file_%s.root" % (datatiers[index/2])
         ls = line.split()
         ls[1] = filename
         modded_lines.append("    %s" % (" ".join(ls)))
