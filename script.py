@@ -35,9 +35,9 @@ def chain_all_drivers_into_script(all_drivers, nevents=500):
     lines_to_mod = []
     datatiers = []
     for line in chained_driver.split("\n"):
-        if line.find("fileout") != -1: lines_to_mod.append(line)
-        if line.find("filein") != -1: lines_to_mod.append(line)
-        if line.find("datatier") != -1: datatiers.append(line.split()[1])
+        if "fileout" in line: lines_to_mod.append(line)
+        if "filein" in line: lines_to_mod.append(line)
+        if "datatier" in line: datatiers.append(line.split()[1])
 
     # Get the modded lines
     modded_lines = []
@@ -50,9 +50,9 @@ def chain_all_drivers_into_script(all_drivers, nevents=500):
     # Now replace the lines with modded lines
     modded_chained_driver = []
     for line in chained_driver.split("\n"):
-        if line.find("fileout") != -1 or line.find("filein") != -1:
+        if "fileout" in line or "filein" in line:
             modded_chained_driver.append(modded_lines.pop(0))
-        elif line.find(" -n ") != -1:
+        elif " -n " in line:
             ls = line.split()
             ls[1] = "%d" % nevents
             modded_chained_driver.append("    %s" % (" ".join(ls)))
@@ -82,15 +82,15 @@ def chain_driver_with_cmsRun_commands(all_drivers):
         chained_driver_with_cmsRun.append(line)
 
         # Then be on the lookout for the --python_filename option
-        if line.find("--python_filename") != -1:
+        if "--python_filename" in line:
             cfgname = line.split()[1]
 
         # Then be on the lookout for the --datatier option
-        if line.find("--datatier") != -1:
+        if "--datatier" in line:
             datatier = line.split()[1]
 
         # If the line we just added is the last line of the cmsDriver.py then sandwich it by cmsRun
-        if line.find(" || exit $?") != -1 and line.find(" -n ") != -1:
+        if " || exit $?" in line and " -n " in line:
             chained_driver_with_cmsRun.append("cmsRun -e -j %s.xml %s" % (datatier, cfgname))
 
     return "\n".join(chained_driver_with_cmsRun)
@@ -108,7 +108,7 @@ def get_datatier(driver):
 
     datatier = ""
     for line in driver.split("\n"):
-        if line.find("datatier") != -1:
+        if "datatier" in line:
             datatier = line
 
     if datatier == "":
@@ -151,7 +151,7 @@ def get_all_drivers(dataset_name, output=[]):
 # Note   : Assumes LHE datasets have "/LHE" strings
 def is_LHE_dataset(dataset_name):
 
-    if dataset_name.find("/LHE") != -1:
+    if "/LHE" in dataset_name:
         return True
     else:
         return False
@@ -184,7 +184,7 @@ def get_input_dataset_name(driver):
     cmsDriverCommand = ""
     # Grep the line with the tag "--filein"
     for line in driver.split("\n"):
-        if line.find("--filein") != -1:
+        if "--filein" in line:
              cmsDriverCommand = line
              break
 
@@ -252,7 +252,7 @@ def format_driver(driver):
     for line in driver.split("\n"):
 
         # If the line contains "cmsDriver.py" it's the line that creates the configuration driver
-        if line.find("cmsDriver.py") != -1:
+        if "cmsDriver.py" in line:
 
             # Split the cmsDriver command line by options
             items = line.split(" -")
@@ -284,8 +284,8 @@ def format_driver(driver):
 def is_driver_formatted(driver):
     for line in driver.split("\n"):
         # If the line contains "cmsDriver.py" it's the line that creates the configuration driver
-        if line.find("cmsDriver.py") != -1:
-            if line.find("\\") != -1:
+        if "cmsDriver.py" in line:
+            if "\\" in line:
                 return True
             else:
                 return False
