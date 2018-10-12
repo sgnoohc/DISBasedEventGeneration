@@ -34,13 +34,13 @@ def main():
                     # This prompts metis to start submitting jobs based on however many .lhe dummy files user creates
                     # The real .lhe files will be created from the condor executables.
                     sample = DirectorySample(
-                        location="/hadoop/cms/store/user/phchang/metis/private/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_PRIVATE-TEST-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/lhe",
+                        location="/hadoop/cms/store/user/phchang/metis/private/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_PRIVATE-TEST/lhe",
                         globber="*.lhe",
-                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-TEST-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM",
+                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-TEST/MINIAODSIM",
                         ),
                     tag                  = job_tag,
                     executable           = exec_path,
-                    special_dir          = hadoop_path + "/private/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_PRIVATE-TEST-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/miniaod",
+                    special_dir          = hadoop_path + "/private/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_PRIVATE-TEST/miniaod",
                     output_name          = "output.root",
                     files_per_output     = 1,
                     condor_submit_params = {"sites" : "T2_US_UCSD"},

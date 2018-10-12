@@ -463,14 +463,14 @@ else
     echo "CMSSWVERSION  : $5"
     echo "SCRAMARCH     : $6"
     shift 6
-    tar xvzf package.tar.gz
-    if [ $? -eq 0 ]; then
-        echo "Successfully untarred package."
-        :
-    else
-        echo "Failed to untar package."
-        exit
-    fi
+    #tar xvzf package.tar.gz
+    #if [ $? -eq 0 ]; then
+    #    echo "Successfully untarred package."
+    #    :
+    #else
+    #    echo "Failed to untar package."
+    #    exit
+    #fi
 fi
 ###################################################################################################
 
