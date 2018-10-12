@@ -200,7 +200,6 @@ cmsDriver.py step1 \
     --datatier GEN-SIM-RAW \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
     --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:@frozen2016 \
-    --nThreads 4 \
     --datamix PreMix \
     --era Run2_2016 \
     --python_filename SUS-RunIISummer16DR80Premix-00125_1_cfg.py \
@@ -218,7 +217,6 @@ cmsDriver.py step2 \
     --datatier AODSIM \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
     --step RAW2DIGI,RECO,EI \
-    --nThreads 4 \
     --era Run2_2016 \
     --python_filename SUS-RunIISummer16DR80Premix-00125_2_cfg.py \
     --no_exec \
@@ -251,7 +249,6 @@ cmsDriver.py step1 \
     --datatier MINIAODSIM \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
     --step PAT \
-    --nThreads 4 \
     --era Run2_2016 \
     --python_filename SUS-RunIISummer16MiniAODv2-00168_1_cfg.py \
     --no_exec \
