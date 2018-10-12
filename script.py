@@ -339,6 +339,9 @@ def get_condor_executable_script_string(script_string):
     # Loop over the lines and print out the scripts from the local files with few additional lines depending on the --datatier
     for line in script_string.split("\n"):
 
+        # For condor jobs, use only one 1 cpu per node
+        if "--nThreads" in line: continue
+
         # The run number and random seeds needs to be customized for each condor jobs.
         # The special strings defined in customise_commands_<type> global string contains the necessary modifications.
         # So as we print out the lines we add a lines depending on the conditions
