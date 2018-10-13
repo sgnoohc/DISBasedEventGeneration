@@ -1,6 +1,7 @@
 import metis
 from metis.CMSSWTask import CMSSWTask
 from metis.Sample import DirectorySample
+from metis.Sample import DummySample
 from metis.StatsParser import StatsParser
 from metis.CondorTask import CondorTask
 from time import sleep
@@ -30,13 +31,10 @@ def main():
         for mass in masspoints:
 
             miniaod = CondorTask(
-                    # Below is a dummy .lhe dataset that contains empty .lhe files.
-                    # This prompts metis to start submitting jobs based on however many .lhe dummy files user creates
-                    # The real .lhe files will be created from the condor executables.
-                    sample = DirectorySample(
-                        location="/hadoop/cms/store/user/phchang/metis/private/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_PRIVATE-TEST/lhe",
-                        globber="*.lhe",
-                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-TEST/MINIAODSIM",
+                    # Dummy sample as no input is needed in generating the events
+                    sample = DummySample(
+                        N=10,
+                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-TEST/MINIAODSIM"
                         ),
                     tag                  = job_tag,
                     executable           = exec_path,
