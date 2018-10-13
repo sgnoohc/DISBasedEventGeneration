@@ -13,7 +13,7 @@ def main():
 
     main_dir = os.path.dirname(os.path.abspath(__file__))
     metis_path = os.path.dirname(os.path.dirname(metis.__file__))
-    exec_path = main_dir + "/condor.sh"
+    exec_path = main_dir + "/metis.sh"
     hadoop_path = "metis/"
     metis_dashboard_path = os.path.join(metis_path, "dashboard")
     job_tag = ""
