@@ -342,25 +342,8 @@ def get_condor_executable_script_string(script_string):
         # For condor jobs, use only one 1 cpu per node
         if "--nThreads" in line: continue
 
-        # The run number and random seeds needs to be customized for each condor jobs.
-        # The special strings defined in customise_commands_<type> global string contains the necessary modifications.
-        # So as we print out the lines we add a lines depending on the conditions
-
-        # If LHE and not GEN-SIM then print customise_commands_LHE
-        if "--datatier" in line and "LHE" in line and "GEN-SIM" not in line:
-            print customise_commands_LHE
-            print line
-        # If not LHE and GEN-SIM then print customise_commands_GS
-        elif "--datatier" in line and "LHE" not in line and "GEN-SIM" in line:
-            # double check whether it's GEN-SIM and not GEN-SIM-RAW (n.b. there are GEN-SIM and also GEN-SIM-RAW while we need customise commands for GEN-SIM only)
-            ls = line.split()[1].split(",")
-            if "GEN-SIM" in ls:
-                print customise_commands_GS
-                print line
-            else:
-                print line
-        # If LHE and GEN-SIM then print customise_commands_LHEGS
-        elif "--datatier" in line and "LHE" in line and "GEN-SIM" in line:
+        # If "LHE" step, some customise_commands needed
+        if "--datatier" in line and "LHE" in line:
             print customise_commands_LHEGS
             print line
         else:
@@ -369,7 +352,6 @@ def get_condor_executable_script_string(script_string):
         # As we go through the lines we also pick up the "FINALOUTPUT" root file to be gfal-copied
         if "--fileout" in line:
             final_output_file = line.split()[1][5:]
-
 
         # As we go through the lines we pick up the .xml paths
         if "cmsRun " in line:

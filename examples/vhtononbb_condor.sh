@@ -130,7 +130,7 @@ cmsDriver.py Configuration/GenProduction/python/SUS-RunIIWinter15wmLHE-00052-fra
     --fileout file:file_LHE.root \
     --mc \
     --eventcontent LHE \
-    --customise_commands "process.RandomNumberGeneratorService.externalLHEProducer.initialSeed = ${RANDOMSEED}" \
+    --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(50) \n process.source.firstRun = cms.untracked.uint32(${JOBNUM}) \n process.RandomNumberGeneratorService.externalLHEProducer.initialSeed = ${RANDOMSEED}" \
     --datatier LHE \
     --conditions MCRUN2_71_V1::All \
     --step LHE \
@@ -164,7 +164,6 @@ cmsDriver.py Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragme
     --mc \
     --eventcontent RAWSIM \
     --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring \
-    --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(50) \n process.source.firstRun = cms.untracked.uint32(${JOBNUM})" \
     --datatier GEN-SIM \
     --conditions MCRUN2_71_V1::All \
     --beamspot Realistic50ns13TeVCollision \
