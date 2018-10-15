@@ -31,10 +31,15 @@ def main():
         for mass in masspoints:
 
             miniaod = CondorTask(
+                    ## Dummy sample as no input is needed in generating the events
+                    #sample = DummySample(
+                    #    N=3000,
+                    #    dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM"
+                    #    ),
                     # Dummy sample as no input is needed in generating the events
                     sample = DummySample(
-                        N=3000,
-                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM"
+                        N=15000,
+                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM"
                         ),
                     tag                  = job_tag,
                     executable           = exec_path,
@@ -60,7 +65,7 @@ def main():
         StatsParser(data=total_summary, webdir=metis_dashboard_path).do()
 
         # Print msummary table so I don't have to load up website
-        os.system("msummary | tee summary.txt")
+        os.system("msummary -p ext2 | tee summary.txt")
         os.system("chmod -R 755 {}".format(metis_dashboard_path))
 
         # If all done exit the loop

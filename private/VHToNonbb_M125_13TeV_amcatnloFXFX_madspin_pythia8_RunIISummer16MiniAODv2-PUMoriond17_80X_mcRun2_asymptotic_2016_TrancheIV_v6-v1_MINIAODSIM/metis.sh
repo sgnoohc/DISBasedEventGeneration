@@ -96,7 +96,6 @@ if [ -z ${RANDOMSEED} ]; then usage; fi
 date
 echo "================================================"
 echo "$(basename $0) $*"
-echo "$(basename $0) $*" >> $DIR/.$(basename $0).history
 echo "------------------------------------------------"
 echo "FRAGMENT          : ${FRAGMENT}"
 echo "OUTDIR            : ${OUTDIR}"
@@ -108,7 +107,9 @@ echo "TAG               : ${TAG}"
 echo "================================================"
 
 
-
+echo "==========="
+echo "LHE STEP"
+echo "==========="
 
 #!/bin/bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -140,6 +141,17 @@ cmsDriver.py Configuration/GenProduction/python/SUS-RunIIWinter15wmLHE-00052-fra
     -n 750 || exit $? ;
 cmsRun -e -j LHE.xml SUS-RunIIWinter15wmLHE-00052_1_cfg.py
 
+NEVENTS=$(grep TotalEvents LHE.xml | tr '>' ' ' | tr '<' ' ' | awk '{print $2}')
+if [ "$NEVENTS" -gt 300 ]; then
+    :
+else
+    echo $NEVENTS less than 300. Quitting the job...
+    exit
+fi
+
+echo "==========="
+echo "GS STEP"
+echo "==========="
 
 
 #!/bin/bash
@@ -153,12 +165,59 @@ fi
 cd CMSSW_7_1_18/src
 eval `scram runtime -sh`
 
-curl -s --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/SUS-RunIISummer15GS-00050 --retry 2 --create-dirs -o Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py 
-[ -s Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py ] || exit $?;
+#curl -s --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/SUS-RunIISummer15GS-00050 --retry 2 --create-dirs -o Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py 
+#[ -s Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py ] || exit $?;
+
+cat << EOF > vhww_fragment.py
+import FWCore.ParameterSet.Config as cms
+from Configuration.Generator.Pythia8CommonSettings_cfi import *
+from Configuration.Generator.Pythia8CUEP8M1Settings_cfi import *
+from Configuration.Generator.Pythia8aMCatNLOSettings_cfi import *
+generator = cms.EDFilter("Pythia8HadronizerFilter",
+maxEventsToPrint = cms.untracked.int32(1),
+pythiaPylistVerbosity = cms.untracked.int32(1),
+filterEfficiency = cms.untracked.double(1.0),
+pythiaHepMCVerbosity = cms.untracked.bool(False),
+comEnergy = cms.double(13000.),
+PythiaParameters = cms.PSet(
+pythia8CommonSettingsBlock,
+pythia8CUEP8M1SettingsBlock,
+pythia8aMCatNLOSettingsBlock,
+  processParameters = cms.vstring(
+  'JetMatching:setMad = off',
+  'JetMatching:scheme = 1',
+  'JetMatching:merge = on',
+  'JetMatching:jetAlgorithm = 2',
+  'JetMatching:etaJetMax = 999.',
+  'JetMatching:coneRadius = 1.',
+  'JetMatching:slowJetPower = 1',
+  'JetMatching:qCut = 18.', #this is the actual merging scale
+  'JetMatching:doFxFx = on',
+  'JetMatching:qCutME = 10.',#this must match the ptj cut in the lhe generation step
+  'JetMatching:nQmatch = 5', #4 corresponds to 4-flavour scheme (no matching of b-quarks), 5 for 5-flavour scheme
+  'JetMatching:nJetMax = 2', #number of partons in born matrix element for highest multiplicity
+  'SLHA:useDecayTable = off',  # Use pythia8s own decay mode instead of decays defined in LH accord
+  '25:m0 = 125.0',
+  '25:onMode = off', # Allow all higgs decays 
+  '25:onIfAny = 24',    # Switch decays of b quarks off
+  ),
+parameterSets = cms.vstring('pythia8CommonSettings',
+'pythia8CUEP8M1Settings',
+'pythia8aMCatNLOSettings',
+'processParameters',
+)
+)
+)
+
+EOF
+
+mkdir -p Configuration/GenProduction/python/
+cp vhww_fragment.py Configuration/GenProduction/python/
 
 scram b
 cd ../../
-cmsDriver.py Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py \
+#cmsDriver.py Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragment.py \
+cmsDriver.py Configuration/GenProduction/python/vhww_fragment.py \
     --filein file:file_LHE.root \
     --fileout file:file_GEN-SIM.root \
     --mc \
@@ -174,6 +233,10 @@ cmsDriver.py Configuration/GenProduction/python/SUS-RunIISummer15GS-00050-fragme
     -n 750 || exit $? ;
 cmsRun -e -j GEN-SIM.xml SUS-RunIISummer15GS-00050_1_cfg.py
 
+
+echo "==========="
+echo "Premix STEP"
+echo "==========="
 
 
 #!/bin/bash
@@ -207,6 +270,10 @@ cmsDriver.py step1 \
     -n 750 || exit $? ;
 cmsRun -e -j GEN-SIM-RAW.xml SUS-RunIISummer16DR80Premix-00125_1_cfg.py
 
+echo "==========="
+echo "AODSIM Step"
+echo "==========="
+
 cmsDriver.py step2 \
     --filein file:file_GEN-SIM-RAW.root \
     --fileout file:file_AODSIM.root \
@@ -224,6 +291,9 @@ cmsDriver.py step2 \
 cmsRun -e -j AODSIM.xml SUS-RunIISummer16DR80Premix-00125_2_cfg.py
 
 
+echo "============"
+echo "MINIAOD Step"
+echo "============"
 
 #!/bin/bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
