@@ -3,21 +3,36 @@
 import dis_client
 import sys
 
-DEBUG=False
+DEBUG=True
 
 #############################################################
 def main():
 
     dataset_name = "/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM"
-    dataset_name = "/VBFHToWWToLNuQQ_M125_13TeV_powheg_JHUGenV628_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM"
+    #dataset_name = "/VBFHToWWToLNuQQ_M125_13TeV_powheg_JHUGenV628_pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM"
+    dataset_name = "/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
+    dataset_name = "/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM"
 
-    all_drivers = get_all_drivers(dataset_name)
+    #all_drivers = get_all_drivers(dataset_name)
+    all_drivers = load_all_drivers_from_files(["www_step0.sh", "www_step1.sh", "www_step2.sh"])
+    all_drivers = load_all_drivers_from_files(["vh_step0.sh", "vh_step1.sh", "vh_step2.sh"])
 
     script_string = chain_all_drivers_into_script(all_drivers, 10)
 
-    script_string = reroute_pileup_input_to_cached_files(script_string)
+    #script_string = reroute_pileup_input_to_cached_files(script_string)
 
-    get_condor_executable_script_string(script_string)
+    print script_string
+
+    #get_condor_executable_script_string(script_string)
+
+#############################################################
+# Input : list of file paths that contains the driver setup commands for each steps
+# Output : all_drivers in string as if the output is from "get_all_drivers" function
+def load_all_drivers_from_files(list_file_path):
+    rtn_list = []
+    for file_path in list_file_path:
+        rtn_list.append(format_driver('\n'.join([ x.replace('\n','') for x in open(file_path).readlines()])))
+    return rtn_list
 
 #############################################################
 # Input : chained script string
@@ -25,7 +40,8 @@ def main():
 def reroute_pileup_input_to_cached_files(script_string):
 
     pileup_caches = {
-        "    --pileup_input \"dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW\" \\" : "    --pileup_input \"file:/hadoop/cms/store/user/mliu/pileupfile/summer16_fullsim.root\" \\"
+        "    --pileup_input \"dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW\" \\" : "    --pileup_input \"file:/hadoop/cms/store/user/mliu/pileupfile/summer16_fullsim.root\" \\",
+        "    --pileup_input \"dbs:/Neutrino_E-10_gun/RunIISummer17PrePremix-MC_v2_94X_mc2017_realistic_v9-v1/GEN-SIM-DIGI-RAW\" \\" : "    --pileup_input \"file:/hadoop/cms/store/user/mliu/pileupfile/2017pu.root\" \\",
     }
 
     rtn_str_list = []
@@ -70,7 +86,7 @@ def chain_all_drivers_into_script(all_drivers, nevents=500):
     # Get the modded lines
     modded_lines = []
     for index, line in enumerate(lines_to_mod):
-        filename = "file:file_%s.root" % (datatiers[index/2])
+        filename = "file:file_%s.root" % (datatiers[index/2].replace(',','__'))
         ls = line.split()
         ls[1] = filename
         modded_lines.append("    %s" % (" ".join(ls)))

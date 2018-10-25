@@ -38,8 +38,8 @@ def main():
                     #    ),
                     # Dummy sample as no input is needed in generating the events
                     sample = DummySample(
-                        N=15000,
-                        dataset="/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/PRIVATE-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM"
+                        N=3500,
+                        dataset="/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/PRIVATE-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
                         ),
                     tag                  = job_tag,
                     executable           = exec_path,
